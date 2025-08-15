@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cryptocurrency Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: url(crypto.jpeg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #333; }
+    label { font-weight: bold 200px; }
+    select {
+      padding: 5px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    h2 { margin-top: 20px; color: #444; }
+    p { font-size: 1.2em; margin: 5px 0; }
+    span { font-weight: bold; color: #007BFF; }
+  </style>
+</head>
+<body>
+  <h1>Cryptocurrency Dashboard</h1>
+
+  <label for="coin">Select Coin:</label>
+  <select id="coin"></select>
+
+  <h2>Statistics</h2>
+  <p>Price: $<span id="price">-</span></p>
+  <p>24h High: $<span id="high">-</span></p>
+  <p>24h Low: $<span id="low">-</span></p>
+
+  <script>
+    const API = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc";
+    const coinSelect = document.getElementById("coin");
+    const priceEl = document.getElementById("price");
+    const highEl = document.getElementById("high");
+    const lowEl = document.getElementById("low");
+    let coinsList = [];
+
+    async function loadCoins() {
+      coinsList = await fetch(API).then(res => res.json());
+
+      coinsList.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.name;
+        coinSelect.appendChild(opt);
+      });
+
+      loadData(coinsList[0].id); // load first coin by default
+    }
+
+    function loadData(coinId) {
+      const coin = coinsList.find(c => c.id === coinId);
+      if (coin) {
+        priceEl.textContent = coin.current_price.toLocaleString();
+        highEl.textContent = coin.high_24h.toLocaleString();
+        lowEl.textContent = coin.low_24h.toLocaleString();
+      }
+    }
+
+    coinSelect.addEventListener("change", e => loadData(e.target.value));
+
+    loadCoins();
+  </script>
+</body>
+</html>
